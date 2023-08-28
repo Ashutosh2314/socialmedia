@@ -1,0 +1,132 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+{% if modelViewedUser == user %}
+<div class = "text-center container border rounded alert alert-primary">
+	This is how you appear publicly.
+</div>
+{% endif %}
+
+<div class = "container border rounded p-3">
+<div style="align-items:flex-start;">
+	<div style="display:inline-flex">
+		<div>
+			<img class = "rounded-circle" style="width:5rem;height:5rem;" src = "{{modelViewedUser.profile_picture.url}}">
+		</div>
+		<div class = 'ml-3 my-auto'>
+			<h2 class = "account-heading mb-0">
+				{{modelViewedUser.username}}
+			</h2>
+			
+			{% if modelViewedUser != user and modelViewedUser in user.follows.all %}
+			<p class = "mt-0" 
+			data-url = "{% url 'communities:follow-add-remove' modelViewedUser.username %}" id = "p__follow-unfollow-user">
+				<span class = "text-danger">
+					Unfollow {{modelViewedUser.username}}?
+				</span>
+				{% elif modelViewedUser != user and modelViewedUser not in user.follows.all %}
+				<span class = "text-success">
+					Follow {{modelViewedUser.username}}?
+				</span>
+			</p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+</div>
+
+<br>
+
+<div class = "container border rounded p-3">
+	<h3>About:</h3>
+	<p>
+		{{modelViewedUser.about}}
+	</p>
+</div>
+
+<br>
+
+<div class = "container border rounded p-3">
+<h4>
+	Stats:
+</h4>
+<ul>
+	<li>
+		Joined: {{modelViewedUser.date_joined}}
+	</li>
+	<li>
+		Users helped: {{modelViewedUser.int_users_helped}}
+	</li>
+	<li>
+		Days active: {{modelViewedUser.int_days_active}}
+	</li>
+</ul>
+</div>
+
+<br>
+<div class = "container border rounded p-3">
+	<h4 class = 'text-center'>
+		All posts from {{modelViewedUser.username}}
+	</h4>
+	{% if qsPosts|length == 0 %}
+		<p class = "text-muted text-center">
+			Nothing yet!
+		</p>
+	{% else %}
+		{% for modelPost in qsPosts %}
+		<a href = "{{modelPost.get_absolute_url}}">
+			{% include 'communities/t/tPostThumb.html' %}
+		</a>
+		{% endfor %}
+	{% endif %}
+</div>
+
+<br>
+
+<div class = 'container'>
+	<ul class='pagination justify-content-center'>
+	{% if qsPosts.has_previous %}
+		<li class="mx-1"><a href='{% url "communities:profile" modelViewedUser.username qsPosts.previous_page_number %}'>Previous</a></li>
+	{% else %}
+		<li class='mx-1 disabled'><span >Previous</span></li>
+	{% endif %}
+
+	{% for i in qsPosts.paginator.page_range %}
+		{% if qsPosts.number == i %}
+		<li class='active mx-1 text-success'><span>{{ i }}</span></li>
+		{% else %}
+		<li class="mx-1"><a href='{% url "communities:profile" modelViewedUser.username i %}'>{{ i }}</a></li>
+		{% endif %}
+	{% endfor %}
+	
+	{% if qsPosts.has_next %}
+		<li class="mx-1"><a href='{% url "communities:profile" modelViewedUser.username qsPosts.next_page_number %}' >Next</a></li>
+	{% else %}
+		<li class="mx-1"><span class='disabled'>Next</span></li> 
+	{% endif %}
+	</ul>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+	function add_remove_follow(pTag){
+		let strUrl = pTag.getAttribute('data-url');
+		$.ajax({
+			url:strUrl,
+			success: function(){
+				$("#p__follow-unfollow-user").load(document.URL + ' #p__follow-unfollow-user');
+			}
+		})
+
+	}
+
+	let pTag = document.getElementById('p__follow-unfollow-user');
+	pTag.addEventListener("click",()=>{
+		add_remove_follow(pTag);
+	})
+
+</script>
+{% endblock javascript %}

@@ -1,0 +1,79 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class = "container border border-primary rounded p-3">
+	<h1 class = 'text-center'>
+		Communities
+	</h1>
+</div>
+
+<br>
+
+{% if user.is_pod_plus_member %}
+<div class = "container border rounded p-3">
+	<div class = "d-flex flex-row justify-content-center">
+		<i class="bi bi-star mr-3 mt-1"></i>
+		<a href = "{% url 'communities:leaderboard-index' %}">
+			<h4 class = "text-center">
+				Community Leaderboard (POD+ Exclusive)
+			</h4>
+		</a>
+		<i class="bi bi-star ml-3 mt-1"></i>
+	</div>
+</div>
+{% endif %}
+
+<br>
+
+<div class = "container border rounded p-3">
+	<a href = "{% url 'communities:post-prepare' %}">
+		<h4 class ="text-center">
+			Create a post.
+		</h4>
+	</a>
+</div>
+
+<br>
+
+<div class = "container border border rounded p-3">
+	<div>
+		<h4 class = "text-center">Recent posts:</h4>
+	</div>
+	
+	<div class = "container" id = "div__posts-container" >
+		{% include 'communities/t/posts.html' %}
+	</div>
+
+</div>
+
+
+{% include 'communities/t/jPostActions.html' %}
+
+{% endblock content %}
+
+{% block javascript %}
+
+<script>
+
+function ajax_update_url(e){
+	strUrl = e.getAttribute("data-url");
+	let divPostContainer = document.getElementById('div__posts-container');
+
+	$.ajax({
+		type: 'GET',
+		url: strUrl,
+		dataType:'json',
+		success:function(data){
+			// reload posts
+			divPostContainer.innerHTML = data.posts_html;
+			// update url
+			window.history.pushState(null,"",strUrl);
+		},
+
+	})
+}
+
+</script>
+
+{% endblock %}

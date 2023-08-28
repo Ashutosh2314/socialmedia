@@ -1,0 +1,70 @@
+<div id = "div__notif-dm-holder">
+	<h3 class = "text-center">
+        Activity for Your Direct Messages
+	</h3>
+	{% if qsNotifDms|length == 0 %}
+		<p class = "text-center">
+			All caught up!
+		</p>
+	{% else %}
+		{% for modelNotif in qsNotifDms %}
+			{% include 'core/t/tNotificationDm.html' %}
+		{% endfor %}
+	{% endif %}
+	<div class = 'container'>
+		<ul class='pagination justify-content-center'>
+		{% if qsNotifDms.has_previous %}
+			<li class="mx-1">
+				<p class = "text-primary" ajax-url = "{% url 'core:ajax-index-dms' intNotifPostPgNum intNotifHrPgNum qsNotifDms.previous_page_number %}"
+				change-url = '{% url "core:index" intNotifPostPgNum  intNotifHrPgNum qsNotifDms.previous_page_number %}'
+				onclick = "ajax_update_url(this,'div__notif-dm-holder')"
+				>
+					Previous
+				</p>
+			</li>
+		{% else %}
+			<li class='mx-1 disabled'>
+				<span>
+					Previous
+				</span>
+			</li>
+		{% endif %}
+
+		{% for i in qsNotifDms.paginator.page_range %}
+			{% if qsNotifDms.number == i %}
+			<li class='active mx-1'>
+				<span class = 'text-success'>
+					{{ i }}
+				</span>
+			</li>
+			{% else %}
+			<li class="mx-1">
+				<p	class = 'text-primary' ajax-url = '{% url "core:ajax-index-dms" intNotifPostPgNum  intNotifHrPgNum i %}'
+					change-url='{% url "core:index" intNotifPostPgNum  intNotifHrPgNum i %}'
+					onclick = "ajax_update_url(this,'div__notif-dm-holder')"
+				>
+					{{ i }}
+				</p>
+			</li>
+			{% endif %}
+		{% endfor %}
+		
+		{% if qsNotifDms.has_next %}
+			<li class="mx-1">
+				<p  class = "text-primary"
+					ajax-url = '{% url "core:ajax-index-dms" intNotifPostPgNum  intNotifHrPgNum qsNotifDms.next_page_number %}'
+					onclick = "ajax_update_url(this,'div__notif-dm-holder')"
+					change-url='{% url "core:index" intNotifPostPgNum  intNotifHrPgNum qsNotifDms.next_page_number %}'>
+						Next
+				</p>
+			</li>
+		{% else %}
+			<li class="mx-1">
+				<span class='disabled'>
+					Next
+				</span>
+			</li> 
+		{% endif %}
+		</ul>
+	</div>
+</div>

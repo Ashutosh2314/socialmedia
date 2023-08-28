@@ -1,0 +1,127 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class = "container text-center border border-primary rounded p-3">
+	<div class = "d-flex flex-row">
+		<h1>
+			<i class="bi bi-newspaper"></i>
+		</h1>
+		<h1 class = 'container text-center'>
+			Newsfeed
+		</h1>
+		<h1>
+			<i class="bi bi-newspaper"></i>
+		</h1>
+	</div>
+</div>
+
+<br>
+
+<div class = "container border rounded p-3">
+	<h4 class = "text-center">
+		<a href = "{% url 'newsfeed:help-request-prepare' %}">
+			Request Help
+		</a>
+	</h4>
+</div>
+
+<br>
+<div class = "container border rounded p-3">
+	<h4 class = "text-center">
+		<a href ="{% url 'newsfeed:help-request-archive-detail' %}">
+			View Your Requests
+		</a>
+	</h4>
+</div>
+
+<br>
+
+<div class = "container border rounded p-3">
+	<h4 class = "text-center">
+		<a href ="{% url 'newsfeed:help-request-accepted' %}">
+			View Your Accepted Offers
+		</a>
+	</h4>
+</div>
+
+<br>
+
+<div class = "container border border rounded p-3">
+	<h4 class = 'text-center'>
+		Recent Help Requests
+	</h4>
+	<div id = "div__help-requests-holder">
+		{% include 'newsfeed/t/index_help_requests.html' %}
+	</div>
+</div>
+
+<br>
+
+<div class = "container border border rounded p-3">
+	<h4 class = 'text-center'>
+		See what your followed users are posting.
+	</h4>
+	{% if listLastNFollowedUserPosts|length == 0 %}
+		<p class = "text-muted text-center">
+			Looks like theres nothing yet!
+		</p>
+	{% else %}
+		{% for modelPost in listLastNFollowedUserPosts %}
+			{% include "communities/t/tPostThumb.html" %}
+		{% endfor %}
+	{% endif %}
+</div>
+
+<br>
+
+<div class = "container border border rounded p-3">
+	<h4 class = 'text-center'>
+		Most recent posts today.
+	</h4>
+	{% if listRecentPosts|length == 0 %}
+		<p class = "text-muted text-center">
+			Looks like theres nothing yet!
+		</p>
+	{% endif %}
+	{% for modelPost in listRecentPosts %}
+
+		{% include "communities/t/tPostThumb.html" %}
+
+	{% endfor %}
+</div>
+
+
+{% endblock content %}
+
+{% include 'newsfeed/t/jsHelpRequest.html' %}
+
+{% block javascript %}
+
+<script>
+
+function ajax_update_url(e,divName){
+	page = e.getAttribute('page');
+	strUrl = e.getAttribute('data-url');
+	let divHolder = document.getElementById(divName);
+
+	$.ajax({
+		type:"GET",
+		url:strUrl,
+		dataType:'json',
+		// all the args for url
+		data:{
+			'page':page,
+		},
+		success: function(data){
+			// reload stuff
+			divHolder.innerHTML = data.data_html;
+			// update url
+			window.history.pushState(null,"",strUrl);
+		}
+	})
+}
+
+</script>
+
+{% endblock %}
